@@ -1,0 +1,29 @@
+name: Daily Dip Screener
+
+on:
+  schedule:
+    # Runs Monday-Friday at 21:00 UTC (around US market close)
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch: # Enables manual "Run" button
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Screener
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python main.py
